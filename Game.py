@@ -1,8 +1,8 @@
-#id = 311453906 Name : Guy Bar-dor
+#id:311453906   name : Guy Bar-dor
 from colorama import Fore, Style, init
 init(autoreset=True)  # הפעלת colorama, עם אופציה לאיפוס הצבע לאחר כל הדפסה
 # הגדרת מחלקת תא
-import string
+
 import random
 
 class Cell:
@@ -45,7 +45,7 @@ class Board:
         # יצירת לוח של תאים, כאשר כל תא הוא אובייקט של המחלקה Cell
         self.grid = [[Cell() for _ in range(columns)] for _ in range(rows)]
         self.game_mode = ""
-    
+        
 
     # פונקציה להגדרת הצבע של תא מסוים בלוח
     def set_cell_color(self, row, column, color):
@@ -58,20 +58,29 @@ class Board:
                 self.grid[row][column].set_available(False)  # סימון התא כלא זמין
                 if self.current_color=="yellow":
                     self.current_color="red"
+                    
                 else:
                     self.current_color="yellow"
-                return True
-
+                return True   
 
             else:
                 print("That cell is not available. Choose another one.")  # הדפסת הודעת שגיאה אם התא לא זמין
+        
         else:
             print("Error: Invalid row or column index.")  # הדפסת הודעת שגיאה אם האינדקסים לא תקינים
         return False
-
     #get current color
     def Get_current_color(self):
         return self.current_color
+    
+    def set_current_color(self):
+        self.Get_current_color("the currenct color is " + self.Get_current_color()) 
+        if(self.Get_current_color() == 'red'):
+            self.current_color = "yellow"
+        else :
+            self.current_color = "red"
+    def print_current_color(self):
+        print("the current color is " + self.current_color)
 
     # פונקציה להדפסת הלוח
     def print_board(self):
@@ -114,32 +123,25 @@ class Board:
                 return row  # החזרת האינדקס של השורה
         return -1  # החזרת -1 אם אין שורה זמינה
 
-    # פונקציה לקליטת קלט מהמשתמש והגדרת צבע לתא
     def input_and_set_cell(self):
-        print("input set celll")
         try:
-            print("the current playet is :" + self.current_color)
-            user_input=""
-            col=-1
-            while not col in [0,1,2,3,4,5]:
-                  user_input = input("Enter column,  (e.g. 1,2, 3 ,4,5,6): ")  # קבלת קלט מהמשתמש
-                  col = user_input  # פיצול הקלט לעמודה וצבע
-
-                  col = int(col) - 1  # התאמת האינדקס של העמודה לאינדקס בפייתון
-                  print(col,self.current_color)
+            print("the current playet is :"+self.current_color)
+            user_input = input("Enter column,  (e.g. 1,2, 3 ,4,5,6): ")  # קבלת קלט מהמשתמש
+            col = user_input  # פיצול הקלט לעמודה וצבע
+            col = int(col) - 1  # התאמת האינדקס של העמודה לאינדקס בפייתון
+            print(col,self.current_color)
             # בדיקה אם העמודה תקינה והצבע הוא מחרוזת
             if col < 0 or col >= self.columns or not self.current_color.isalpha() :
                 print("Error: Column is out of bounds.")  # הדפסת שגיאה אם העמודה לא תקינה
-                
-                      
+                return
             else: 
                 row = self.find_lowest_available_row(col)  # מציאת השורה הנמוכה ביותר הזמינה
                 self.set_cell_color(row, col, self.current_color)  # קביעת הצבע לתא
                 print(f"Set cell ({row+1}, {col+1}) to color {self.current_color}.")  # הדפסת הודעת אישור
-                return  col + 1
-   
+                return row ,col + 1, self.current_color
+
         except ValueError as e:
-                print(f"Invalid input. Please enter column, and color separated by spaces. Error: {e}")  # הדפסת שגיאה אם הקלט לא תקין
+            print(f"Invalid input. Please enter column, and color separated by spaces. Error: {e}")  # הדפסת שגיאה אם הקלט לא תקין
 
     # פונקציה לבדיקת ניצחון על ידי קו מסוים
     def check_line_win(self, start_row, start_col, d_row, d_col, color):
@@ -177,28 +179,47 @@ class Board:
                         if self.check_line_win(row, col, 1, -1, color):  # אלכסוני שמאלה למטה
                             return True,color
         return False,"none"  # אם לא נמצא ניצחון
-    #set game mode 
-    def set_game_mode(self,game_mode):
-        if game_mode == 1:
-            self.game_mode = "singleplayer"
-        elif game_mode == 2:
-            self.game_mode = "multiplayer"
+    #ai move
+    def ai_move(self):
+        print("ai move")
+        available_columns = [col for col in range(self.columns) if self.find_lowest_available_row(col) != -1]
+        if available_columns:
+            col = random.choice(available_columns)  # Randomly choose from available columns
+            row = self.find_lowest_available_row(col)
+            self.set_cell_color(row, col, self.current_color)
+            print(f"AI ({self.current_color}) placed a piece in column {col + 1}")
+            return row, col 
         else:
-            self.game_mode = "game-over"
-    
-    #get the gmae mode 
+            print("No available moves for the AI.")
+        
+
+    def set_game_mode(self,gmaemode):
+        self.game_mode = gmaemode
+
     def get_game_mode(self):
         return self.game_mode
 
-    
-        
-   
-        
-        
-        
-         
-#board = Board(6, 7, ["red", "yellow"])    # מספר הסיבובים לשחק
-#board.Game("singleplayer")
-      
 
-#מצב של תיקו לבדוק 
+    def Game(self, c_game_mode):
+        game_mode = c_game_mode
+        print("game mode is " + game_mode)
+        isGameOn = True
+        while isGameOn:
+            self.print_board()
+            if game_mode.lower() == "singalplayer":
+                print("we are goint to play singleplayer")
+                if self.Get_current_color().lower() == "yellow":
+                    self.input_and_set_cell()
+                else:
+                    self.ai_move()
+            elif game_mode.lower() == "multiplayer":
+                print("we are goint to play multiplayer")
+                self.input_and_set_cell()
+            y, color = self.check_win()
+            if y:
+                self.print_board()
+                print(f"The {color} wins!!!!")
+       
+#board = Board(6, 7, ["red", "yellow"])    # מספר הסיבובים לשחק
+#board.Game()
+      
