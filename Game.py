@@ -1,3 +1,4 @@
+#id = 311453906 Name : Guy Bar-dor
 from colorama import Fore, Style, init
 init(autoreset=True)  # הפעלת colorama, עם אופציה לאיפוס הצבע לאחר כל הדפסה
 # הגדרת מחלקת תא
@@ -178,7 +179,12 @@ class Board:
         return False,"none"  # אם לא נמצא ניצחון
     #set game mode 
     def set_game_mode(self,game_mode):
-        self.game_mode = game_mode.lower()
+        if game_mode == 1:
+            self.game_mode = "singleplayer"
+        elif game_mode == 2:
+            self.game_mode = "multiplayer"
+        else:
+            self.game_mode = "game-over"
     
     #get the gmae mode 
     def get_game_mode(self):
